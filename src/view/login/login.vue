@@ -120,7 +120,7 @@
           //let qs=require("qs");
           //打开登陆进度条
           this.$data.jindustyle.display='block';
-          //每0.1秒更新一下进度
+          //每0.1秒更新一下进度1111
           var timer=setInterval(()=>{
             let pp=this.$data.percent+10;
             if(pp>=100){
