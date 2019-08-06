@@ -24,7 +24,16 @@ Vue.prototype.Cookies=Cookies
 //引入VUEX
 import store from './store/store'
 
+
+//路由拦截
+router.beforeEach((to, from, next)=>{
+
+  next()
+
+})
+
 Vue.config.productionTip = false
+//请求拦截器
 axios.interceptors.request.use((config)=>{
 
   if(config.url.includes("getCode")){//如果是获取验证码的路径
@@ -34,8 +43,7 @@ axios.interceptors.request.use((config)=>{
       Cookies.set("authcode","",{path:"/",domain:"localhost",age:-1})
     }
   }
-
-  //config.headers.setItem("token","")
+  //config.headers.setItem("token","");
 
   return config;
 })
