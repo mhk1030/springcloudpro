@@ -139,7 +139,12 @@
               //存储token到vuex中，
               this.$store.state.token=response.data.token
               this.$store.state.userInfo=response.data.result
-              window.sessionStorage.setItem("userInfo",JSON.stringify(response.data.result))
+
+              //console.log( window.sessionStorage)
+              window.sessionStorage.setItem("username",response.data.result.userName)
+              window.sessionStorage.setItem("userid",response.data.result.id)
+              window.sessionStorage.setItem("user",[JSON.stringify(response.data.result)])
+
               //关闭加载窗
               this.$data.percent=100
               //隐藏进度条
@@ -150,7 +155,7 @@
               //跳转到首页界面
               //将用户ID存入到全局的VUE对象中
 
-              this.$router.push({path:'/',query:{username:response.data.result.userName,userid:response.data.result.id}});
+              this.$router.push({path:'/view/shouye/shouye',query:{username:response.data.result.userName,userid:response.data.result.id}});
 
             }else if(respo.error!=null){
               //关闭加载窗
