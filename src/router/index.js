@@ -12,7 +12,10 @@ export default new Router({
     {
       path: '/',
       name: 'login',
-      component: login
+      component: login,
+      meta:{
+        require: false
+      }
     },
     {
       path: '/view/shouye/shouye',

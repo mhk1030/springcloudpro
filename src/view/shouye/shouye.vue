@@ -166,9 +166,12 @@
           if(command=="b"){//退出操作
 
             this.$confirm('确认登出？').then(_ => {
-               this.$axios.post(this.domain.serverpath+"loginout").then((response)=>{
-                   let sts=response.data.success;
+               this.$axios.post(this.domain.serverpath+"loginout",this.user.id).then((response)=>{
+
+                   let sts=response.data;
+
                    if(sts=="ok"){
+                     window.sessionStorage.clear();
                       this.$router.push({path:'/'});
                    }
                })

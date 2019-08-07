@@ -28,8 +28,17 @@ import store from './store/store'
 //路由拦截
 router.beforeEach((to, from, next)=>{
 
-  next()
-
+  //判断是否登录 to.meta.require是true说明需要进行登录的验证
+  if(to.meta.require){
+    let token = window.sessionStorage.getItem("token")
+    if(token != null){
+          next();
+    }else{
+      next({path:"/"})
+    }
+  }else{
+    next();
+  }
 })
 
 Vue.config.productionTip = false

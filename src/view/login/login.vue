@@ -113,7 +113,7 @@
             return;
           }
           par.code=this.$refs.coderef.value;
-          alert(par.code)
+
           //转JSON串
           //let canshu=this.toAes.encrypt(JSON.stringify(par));
           // let params={canshu:canshu};
@@ -130,17 +130,18 @@
           },100)
           //从cookie中取出某一个名称的Cookie的值
           par.codekey=this.Cookies.get("authcode")
-          alert(par.codekey)
+
           this.$axios.post(this.domain.ssoserverpath+"login",par).then((response)=>{
 
 
-            let respo=response.data;
-            if(respo.code==200){
+
+            if(response.data.code==200){
               //存储token到vuex中，
-              this.$store.state.token=response.data.token
-              this.$store.state.userInfo=response.data.result
+             /* this.$store.state.token=response.data.token
+              this.$store.state.userInfo=response.data.result*/
 
               //console.log( window.sessionStorage)
+              window.sessionStorage.setItem("token",response.data.token)
               window.sessionStorage.setItem("username",response.data.result.userName)
               window.sessionStorage.setItem("userid",response.data.result.id)
               window.sessionStorage.setItem("user",[JSON.stringify(response.data.result)])
@@ -155,7 +156,7 @@
               //跳转到首页界面
               //将用户ID存入到全局的VUE对象中
 
-              this.$router.push({path:'/view/shouye/shouye',query:{username:response.data.result.userName,userid:response.data.result.id}});
+              this.$router.push({path:'/view/shouye/shouye'});
 
             }else if(respo.error!=null){
               //关闭加载窗
@@ -291,7 +292,7 @@
       //参数 url 访问参数
       this.$axios.post(this.domain.ssoserverpath+'getCode').then((response)=>{
         code=response.data.result;
-        alert("ww");
+
         //向浏览器写一个Cookie
         //document.cookie = 'testCookies' + "=" + response.data.token + "; " + -1;
         _this.moveCode(code,_this);

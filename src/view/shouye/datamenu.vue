@@ -4,7 +4,6 @@
              default-active="2"
              class="el-menu-vertical-demo"
              :collapse="isCollapse"
-
              background-color="#545c64"
              text-color="#fff"
              active-text-color="#ffd04b"
@@ -19,12 +18,12 @@
             <span slot="title">{{m1.menuName}}</span>
           </template>
 
-          <div v-for="(m2,m2Index) in m1.menuInfoList" :key="m2Index">
-            <el-submenu v-if="m2.menuInfoList!=null&&m2.menuInfoList.length > 0" :index="getIndex(m2.parentId)+'-'+getIndex(m2.id)" >
+          <div v-for="(m2,m2Index) in m1.menuList" :key="m2Index">
+            <el-submenu v-if="m2.menuList!=null&&m2.menuList.length > 0" :index="getIndex(m2.parentId)+'-'+getIndex(m2.id)" >
               <span slot="title" >{{m2.menuName}}</span>
-              <el-menu-item @click="toforPath(m3.url)" v-for="(m3,m3Index) in m2.menuInfoList" :key="m3Index" :index="getIndex(m2.parentId)+'-'+getIndex(m3.parentId)+'-'+getIndex(m3.id)">{{m3.menuName}}</el-menu-item>
+              <el-menu-item @click="toforPath(m3.url)" v-for="(m3,m3Index) in m2.menuList" :key="m3Index" :index="getIndex(m2.parentId)+'-'+getIndex(m3.parentId)+'-'+getIndex(m3.id)">{{m3.menuName}}</el-menu-item>
             </el-submenu>
-            <el-menu-item v-else @click="toforPath(m2.url)" :index="getIndex(m2.parentId)+'-'+getIndex(m2.id)">{{m2.menuName}}</el-menu-item>
+            <!--<el-menu-item v-else @click="toforPath(m2.url)" :index="getIndex(m2.parentId)+'-'+getIndex(m2.id)">{{m2.menuName}}</el-menu-item>-->
           </div>
         </el-submenu>
     </el-menu>
@@ -38,7 +37,7 @@
           return{
             isCollapse:true,
             wheight:window.innerHeight,
-            listMenu:this.$store.state.userInfo.listMenuInfo
+            listMenu:JSON.parse(window.sessionStorage.getItem("user")).menuList
           }
       },
       methods:{
@@ -56,13 +55,13 @@
           }
         },
         getIndex(index){
-          return ''+index.toString();
+          return ''+index;
         },
         getMenuName(menuName){
           return menuName;
         },
         toforPath(url){
-           if(url!=null){
+           if(url!=null && url != ''){
              //进入对应的路由
              this.$router.push({path:url})
            }else{
@@ -73,6 +72,7 @@
 
       },
       mounted(){
+
           /*this.$axios.post(this.domain.ssoserverpath+"").then((reponse)=>{
               //为data中的listMenu赋值
               this.listMenu=reponse.data.result;
