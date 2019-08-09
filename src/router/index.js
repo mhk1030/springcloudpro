@@ -5,6 +5,9 @@ import shouye from '../view/shouye/shouye'
 import datamenu from '../view/shouye/datamenu'
 import datamain from '../view/shouye/datamain'
 import system from '../view/shouye/system'
+import roledata from '../view/shouye/role/roledata'
+import userdata from '../view/shouye/user/userdata'
+import menudata from '../view/shouye/menu/menudata'
 Vue.use(Router)
 
 export default new Router({
@@ -29,7 +32,27 @@ export default new Router({
           path: "/datamain",
           component: datamain,
           children: [
-            {path:'/system',component:system,meta:{require:true}}
+            {
+              path: "/system",
+              component: system,
+              meta: {require: true}
+            },
+            {
+              path: "/userdata",
+              component: userdata,
+              meta:{require:true}
+            },
+            {
+              path: "/roledata",
+              component: roledata,
+              meta:{require:true}
+            },
+            ,
+            {
+              path: "/menudata",
+              component: menudata,
+              meta:{require:true}
+            }
           ]
         }
       ]
