@@ -58,6 +58,7 @@
 
       <!--以下为列表展示，以上为条件查询-->
       <el-button type="primary" icon="el-icon-circle-plus" @click="add()" style="margin-left: 0px"></el-button>
+      <el-button type="primary" icon="el-icon-document" @click="downloadExcel()" style="margin-left: 0px"></el-button>
       <el-table
         ref="multipleTable"
         :data="tableData"
@@ -148,6 +149,36 @@
         this.getlist(this.mypage)
       },
       methods:{
+        //列表下载
+        downloadExcel() {
+          this.$confirm('确定下载列表文件?', '提示', {
+            confirmButtonText: '确定',
+            cancelButtonText: '取消',
+            type: 'warning'
+          }).then(() => {
+            this.excelData = this.tableData //你要导出的数据list。
+            this.export2Excel()
+          }).catch(() => {
+
+          });
+        },
+        //数据写入excel
+        export2Excel() {
+          var that = this;
+          require.ensure([], () => {
+            const { export_json_to_excel } = require('@/excel/export2Excel'); //这里必须使用绝对路径，使用@/+存放export2Excel的路径
+            const tHeader = ['角色名','描述']; // 导出的表头名信息
+            const filterVal = ['roleName','miaoshu']; // 导出的表头字段名，需要导出表格字段名
+            const list = that.excelData;
+            const data = that.formatJson(filterVal, list);
+
+            export_json_to_excel(tHeader, data, '角色表');// 导出的表格名称，根据需要自己命名
+          })
+        },
+        //格式转换，直接复制即可
+        formatJson(filterVal, jsonData) {
+          return jsonData.map(v => filterVal.map(j => v[j]))
+        },
           getlist(mypage){
             this.$axios.post(this.domain.serverpath+"role/roleList",mypage).then((response)=>{
               this.tableData=response.data.result.list
@@ -177,14 +208,22 @@
             this.form={id:0}
         },
         del(row){
-            this.$axios.post(this.domain.serverpath+"/role/roleDel",row).then((response)=>{
+            this.$axios.post(this.domain.serverpath+"role/roleDel",row).then((response)=>{
               if(response.data.code==200){
                 this.$message({
-                  message: 'ok!  操作成功！',
+                  message: 'ok!'+response.data.success,
                   type: 'success'
                 })
                 this.getlist(this.mypage)
               }
+              if(response.data.code==500){
+                  this.$message({
+                    message: 'Sorry!'+response.data.error,
+                    type: 'error'
+                  })
+                  this.getlist(this.mypage)
+                }
+
             })
         },
         power(row){
@@ -217,7 +256,7 @@
                   message: 'ok!  操作成功！',
                   type: 'success'
                 })
-
+                this.dialogFormVisible1=false
                 this.getlist(this.mypage)
                 this.dialogFormVisible=false;
               }

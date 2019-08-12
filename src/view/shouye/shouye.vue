@@ -28,6 +28,7 @@
               </el-dropdown-menu>
             </el-dropdown>
             <span ref="userinfo_username">{{username}}</span>
+            <el-image :src="img" style="width:40px;height:40px; border-radius:50px;"></el-image>
             <input ref="userinfo_userid" type="hidden" v-model="userid">
             &nbsp;&nbsp;&nbsp;
             <el-dropdown trigger="click" >
@@ -93,14 +94,15 @@
         dialog1Visible: false,
         userid:window.sessionStorage.getItem("userid"),
         username:window.sessionStorage.getItem("username"),
-        user:{},
+        user:JSON.parse(window.sessionStorage.getItem("user")),
         currInfo:{
           userName:'',
           loginName:'',
           sex:'',
           tel:'',
           buMen:''
-        }
+        },
+        img:"http://localhost:8090/"+JSON.parse(window.sessionStorage.getItem("user")).url
       }
     },
     components:{mymenu,mymain},
@@ -187,6 +189,7 @@
 
                  //let userinfo=this.user
               this.user = JSON.parse(window.sessionStorage.getItem("user"))
+              this.img="http://localhost:8090/"+this.user.url
                  //打开用户信息的弹出层
                  this.$data.dialog1Visible=true;
                  //填充用户数据

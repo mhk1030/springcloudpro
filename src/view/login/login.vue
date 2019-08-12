@@ -286,6 +286,8 @@
 
     },
     mounted(){
+      window.sessionStorage.clear();
+      window.localStorage.clear();
       var _this = this;
       var code = "";
       //从后台获取滑动验证码

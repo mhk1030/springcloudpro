@@ -28,8 +28,8 @@
             <label>男<input type="radio" v-model="form.sex" value="1"></input></label>
             <label>女<input type="radio" v-model="form.sex" value="2"></input></label>
           </el-form-item>
-          <el-form-item label="电话" :label-width="formLabelWidth">
-            <el-input v-model="form.tel" autocomplete="off"></el-input>
+          <el-form-item label="电话" :label-width="formLabelWidth" prop="tel">
+            <el-input v-model="form.tel"  autocomplete="off"></el-input>
           </el-form-item>
 
           <el-form-item label="密码"  :label-width="formLabelWidth" prop="password">
@@ -101,9 +101,7 @@
           show-overflow-tooltip>
           <template slot-scope="scope">
             <el-popover trigger="hover" placement="top">
-              <p>
-                <img src="../../../assets/logo.png" height="40px">
-              </p>
+              <el-image :src="'http://localhost:8090/'+scope.row.url" style="width:50px;height:50px"></el-image>
               <p>用户名: {{ scope.row.userName }}</p>
               <p>登录名: {{ scope.row.loginName }}</p>
               <p v-if="scope.row.sex ==1">性  别: 男</p>
@@ -180,6 +178,20 @@
     export default {
         name: "userdata",
       data(){
+
+        var checkPhone = (rule, value, callback) => {
+          if (!value) {
+            return callback(new Error('手机号不能为空'));
+          } else {
+            const reg = /^1[3|4|5|7|8][0-9]\d{8}$/
+            console.log(reg.test(value));
+            if (reg.test(value)) {
+              callback();
+            } else {
+              return callback(new Error('请输入正确的手机号'));
+            }
+          }
+        };
         var validatePass = (rule, value, callback) => {
           if (value === '') {
             callback(new Error('请输入密码'));
@@ -225,7 +237,11 @@
             ],
             checkPass: [
               { validator: validatePass2, trigger: 'blur' }
+            ],
+            tel: [
+              {validator: checkPhone, trigger: 'blur'}
             ]
+
           },
           dialogFormVisible1:false,
           Roles:[],
@@ -240,6 +256,7 @@
       },
       methods:{
         getlist(mypage){
+          let that = this.$router;
           this.$axios.post(this.domain.serverpath+"user/list",mypage).then((response)=>{
 
             this.tableData = response.data.result.list
@@ -275,7 +292,7 @@
         add(){
           this.dialogFormVisible = true
           this.imageUrl=""
-          this.form={id:0,checkPass:""}
+          this.form={id:0,checkPass:"",tel:""}
         },
         update(row){
           this.form = row
@@ -293,19 +310,27 @@
           this.$axios.post(url,this.form).then((response)=>{
             if(response.data.code == 200){
               this.$message({
-                message: 'ok!  操作成功！',
+                message: 'ok! '+response.data.success,
                 type: 'success'
               });
               this.dialogFormVisible=false
               this.getlist(this.mypage)
             }
+
+            if(response.data.code==500){
+              this.$message({
+                message: 'Sorry! '+response.data.error,
+                type: 'error'
+              });
+            }
           })
 
         },
         roles(row){
-          console.log(row)
-          this.userId=row.id
 
+          this.userId=row.id
+          console.log(row)
+         /* this.selroleId=row.Role.roleName*/
           this.$axios.post(this.domain.serverpath+"user/selRole").then((response)=>{
             if(response.data.code==200){
               this.Roles=response.data.result;
