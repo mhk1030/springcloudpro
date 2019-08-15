@@ -30,7 +30,7 @@ router.beforeEach((to, from, next)=>{
 
   //判断是否登录 to.meta.require是true说明需要进行登录的验证
   if(to.meta.require){
-    let token = window.sessionStorage.getItem("token")
+    let token = window.localStorage.getItem("token")
     if(token != null){
           next();
     }else{
@@ -53,12 +53,32 @@ axios.interceptors.request.use((config)=>{
     }
   }
 
-  let token =  window.sessionStorage.getItem("token");
+  let token =  window.localStorage.getItem("token");
 
   config.headers['token']=token
 
   return config;
 })
+
+//设置一个响应拦截器用来刷新token信息start
+axios.interceptors.response.use((response)=>{
+
+  let yy=response.headers['token'];
+
+  if(yy!=undefined){
+    //重新设置localStorge中的token的值，用来刷新tocken
+    window.localStorage.setItem("token",yy)
+  }
+  return response;
+},(error)=>{
+    //失败跳转到登录界面
+    /*router.replace({
+      path: '/',
+      query: {redirect: router.currentRoute.fullPath}
+    })*/
+})
+
+
 /* eslint-disable no-new */
 new Vue({
   el: '#app',

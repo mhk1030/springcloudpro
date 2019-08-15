@@ -57,7 +57,7 @@
       </el-form>
 
       <!--以下为列表展示，以上为条件查询-->
-      <el-button type="primary" icon="el-icon-circle-plus" @click="add()" style="margin-left: 0px"></el-button>
+      <el-button type="primary" icon="el-icon-circle-plus" @click="add()" style="margin-left: 0px" v-if="authmap.includes('roleAdd')"></el-button>
       <el-button type="primary" icon="el-icon-document" @click="downloadExcel()" style="margin-left: 0px"></el-button>
       <el-table
         ref="multipleTable"
@@ -96,8 +96,8 @@
           label="操作"
           width="300">
           <template slot-scope="scope">
-            <el-button type="danger" icon="el-icon-delete" @click="del(scope.row)"></el-button>
-            <el-button type="info" icon="el-icon-s-check" @click="power(scope.row)"></el-button>
+            <el-button type="danger" icon="el-icon-delete" @click="del(scope.row)" v-if="authmap.includes('roleDel')"></el-button>
+            <el-button type="info" icon="el-icon-s-check" @click="power(scope.row)" v-if="authmap.includes('updateRole')"></el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -141,12 +141,16 @@
           },
           menus:[],
           menuIds:[],
-          menuId:{}
+          menuId:{},
+          user:JSON.parse(window.localStorage.getItem("user")),
+          userLeval:"",
+          authmap:window.localStorage.getItem("authmap")
         }
 
       },
       mounted(){
         this.getlist(this.mypage)
+        this.userLeval=this.user.role.leval
       },
       methods:{
         //列表下载
@@ -187,6 +191,11 @@
 
               /*this.menuIds=response.data.result.pageInfo.list.menuIds;
               console.log(this.menuIds)*/
+            }).catch((error)=>{
+              this.$message({
+                message: 'Sorroy! 您无此权限',
+                type: 'error'
+              })
             })
           },
         changePage(current){
@@ -224,13 +233,27 @@
                   this.getlist(this.mypage)
                 }
 
+            }).catch((error)=>{
+              this.$message({
+                message: 'Sorroy! 您无此权限',
+                type: 'error'
+              })
             })
         },
         power(row){
               this.dialogFormVisible=true;
-              this.$axios.post(this.domain.serverpath+"role/power").then((response)=>{
+              let role={
+                roleId:this.user.role.id
+              }
+
+              this.$axios.post(this.domain.serverpath+"role/power",role).then((response)=>{
                 this.menus=response.data.result;
 
+              }).catch((error)=>{
+                this.$message({
+                  message: 'Sorroy! 您无此权限',
+                  type: 'error'
+                })
               })
           this.form=row
           setTimeout(()=>{
@@ -260,6 +283,11 @@
                 this.getlist(this.mypage)
                 this.dialogFormVisible=false;
               }
+            }).catch((error)=>{
+              this.$message({
+                message: 'Sorroy! 您无此权限',
+                type: 'error'
+              })
             })
         }
       }/*,

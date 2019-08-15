@@ -38,7 +38,7 @@
           return{
             isCollapse:true,
             wheight:window.innerHeight,
-            listMenu:JSON.parse(window.sessionStorage.getItem("user")).menuList
+            listMenu:JSON.parse(window.localStorage.getItem("user")).menuList
           }
       },
       methods:{

@@ -7,7 +7,7 @@
           {{forms.menuName}}
        </el-form-item>
         <el-form-item>
-          <el-button type="primary" icon="el-icon-circle-plus-outline" circle @click="add(forms)" :disabled="open"></el-button>
+          <el-button type="primary" icon="el-icon-circle-plus-outline" circle @click="add(forms)" :disabled="open" ></el-button>
           <el-button type="primary" icon="el-icon-edit" circle @click="update(forms)"></el-button>
           <el-button type="danger" icon="el-icon-delete" circle @click="del(forms)"></el-button>
         </el-form-item>
@@ -86,16 +86,21 @@
             fontSize:"70px",
             url:"",
             open:false,
-            dialogFormVisible1:false
+            dialogFormVisible1:false,
+            user:JSON.parse(window.localStorage.getItem("user"))
           }
         },
         mounted(){
 
           this.getList();
+          this.userLeval=this.user.role.leval
         },
         methods:{
           getList(){
-            this.$axios.post(this.domain.serverpath+"menu/menuList").then((response)=>{
+            let role={
+              roleId:this.user.role.id
+            }
+            this.$axios.post(this.domain.serverpath+"menu/menuList",role).then((response)=>{
               this.open=false
               this.menus=response.data.result
 
@@ -140,6 +145,12 @@
           },
           save(){
               this.$axios.post(this.url,this.form).then((response)=>{
+                if(response.data.code == 501){
+                  this.$message({
+                    message: 'Sorroy!'+response.data.error,
+                    type: 'error'
+                  })
+                }
                 if(response.data.code == 200){
                   this.$message({
                     message: 'ok!  操作成功！',
@@ -149,6 +160,12 @@
                   this.url=""
                   this.getList();
                 }
+
+              }).catch((error)=>{
+                this.$message({
+                  message: 'Sorroy! 您无此权限',
+                  type: 'error'
+                })
               })
           },
           close(){

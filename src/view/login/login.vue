@@ -32,6 +32,9 @@
           </div>
         </el-form-item>
 
+        <el-form-item>
+          <el-checkbox v-model="checked"><span style="color:red">七天免登录</span></el-checkbox>
+        </el-form-item>
 
         <div class="login-btn">
           <el-button type="primary" @click="submitForm('ruleForm')">登录</el-button>
@@ -51,6 +54,8 @@
 </template>
 
 <script>
+  import {delCookie, getCookie, setCookie} from "../../until/util";
+
   export default {
     name: "login",
     data(){
@@ -78,7 +83,8 @@
           password: [
             { required: true, message: '请输入密码', trigger: 'blur' }
           ]
-        }
+        },
+        checked:false
       }
     },
     methods:{
@@ -139,12 +145,23 @@
               //存储token到vuex中，
              /* this.$store.state.token=response.data.token
               this.$store.state.userInfo=response.data.result*/
-
+              if(this.checked){
+                setCookie("jian","zhi",7)
+              }
               //console.log( window.sessionStorage)
-              window.sessionStorage.setItem("token",response.data.token)
-              window.sessionStorage.setItem("username",response.data.result.userName)
-              window.sessionStorage.setItem("userid",response.data.result.id)
-              window.sessionStorage.setItem("user",[JSON.stringify(response.data.result)])
+              window.localStorage.setItem("token",response.data.token)
+              window.localStorage.setItem("username",response.data.result.userName)
+              window.localStorage.setItem("userid",response.data.result.id)
+              window.localStorage.setItem("user",[JSON.stringify(response.data.result)])
+
+              let authmap=new Array();
+
+              for(var key in response.data.result.authmap){
+                authmap.push(key.substring(28))
+              }
+
+              window.localStorage.setItem("authmap",authmap)
+              console.log(authmap)
 
               //关闭加载窗
               this.$data.percent=100
@@ -154,9 +171,10 @@
               clearInterval(timer)
 
               //跳转到首页界面
-              //将用户ID存入到全局的VUE对象中
 
               this.$router.push({path:'/view/shouye/shouye'});
+
+
 
             }else if(respo.error!=null){
               //关闭加载窗
@@ -286,19 +304,27 @@
 
     },
     mounted(){
-      window.sessionStorage.clear();
-      window.localStorage.clear();
-      var _this = this;
-      var code = "";
-      //从后台获取滑动验证码
-      //参数 url 访问参数
-      this.$axios.post(this.domain.ssoserverpath+'getCode').then((response)=>{
-        code=response.data.result;
 
-        //向浏览器写一个Cookie
-        //document.cookie = 'testCookies' + "=" + response.data.token + "; " + -1;
-        _this.moveCode(code,_this);
-      })
+      if(getCookie("jian")){
+        alert("7777")
+        this.$router.push({path:'/system'});
+      }else{
+        var _this = this;
+        var code = "";
+        //从后台获取滑动验证码
+        //参数 url 访问参数
+        this.$axios.post(this.domain.ssoserverpath+'getCode').then((response)=>{
+          code=response.data.result;
+
+          //向浏览器写一个Cookie
+          document.cookie = 'testCookies' + "=" + response.data.token + "; " + -1;
+          _this.moveCode(code,_this);
+        })
+      }
+
+      //window.sessionStorage.clear();
+      //window.localStorage.clear();
+
 
 //});
     }

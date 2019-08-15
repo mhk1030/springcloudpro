@@ -80,6 +80,7 @@
 <script>
   import mymenu from './datamenu.vue'
   import mymain from './datamain.vue'
+  import {delCookie} from "../../until/util";
 
   const userinfo={};
 
@@ -92,9 +93,9 @@
         mycontent:"点击打开菜单",
         dialogVisible: false,
         dialog1Visible: false,
-        userid:window.sessionStorage.getItem("userid"),
-        username:window.sessionStorage.getItem("username"),
-        user:JSON.parse(window.sessionStorage.getItem("user")),
+        userid:window.localStorage.getItem("userid"),
+        username:window.localStorage.getItem("username"),
+        user:JSON.parse(window.localStorage.getItem("user")),
         currInfo:{
           userName:'',
           loginName:'',
@@ -102,7 +103,7 @@
           tel:'',
           buMen:''
         },
-        img:"http://localhost:8090/"+JSON.parse(window.sessionStorage.getItem("user")).url
+        img:"http://localhost:8090/"+JSON.parse(window.localStorage.getItem("user")).url
       }
     },
     components:{mymenu,mymain},
@@ -167,12 +168,17 @@
 
           if(command=="b"){//退出操作
 
+            let userId ={
+              id:this.user.id
+            }
             this.$confirm('确认登出？').then(_ => {
-               this.$axios.post(this.domain.serverpath+"loginout",this.user.id).then((response)=>{
+               this.$axios.post(this.domain.serverpath+"user/loginout",userId).then((response)=>{
 
-                   let sts=response.data;
+                   let sts=response.data.code;
 
-                   if(sts=="ok"){
+                   if(sts==200){
+                     delCookie("jian")
+                     window.localStorage.clear();
                      window.sessionStorage.clear();
                       this.$router.push({path:'/'});
                    }
@@ -188,7 +194,7 @@
              //到后台后获取用户的信息
 
                  //let userinfo=this.user
-              this.user = JSON.parse(window.sessionStorage.getItem("user"))
+              this.user = JSON.parse(window.localStorage.getItem("user"))
               this.img="http://localhost:8090/"+this.user.url
                  //打开用户信息的弹出层
                  this.$data.dialog1Visible=true;

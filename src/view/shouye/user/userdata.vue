@@ -1,6 +1,7 @@
 <template>
     <div>
       <!--编辑角色弹窗-->
+
       <el-dialog title="角色信息" :visible.sync="dialogFormVisible1">
         <el-select v-model="selroleId" placeholder="请选择">
           <el-option
@@ -58,6 +59,8 @@
         </div>
       </el-dialog>
 
+      <el-tabs v-model="activeName" @tab-click="handleClick">
+      <el-tab-pane label="角色信息" name="first">
       <!--以下为条件查询，以上为弹出框-->
       <el-form :inline="true" :model="mypage" class="demo-form-inline" style="margin-left: 100px;margin-right: 150px">
         <el-form-item label="用户名">
@@ -83,7 +86,7 @@
       </el-form>
 
       <!--以下为列表展示，以上为条件查询-->
-      <el-button type="primary" icon="el-icon-circle-plus" @click="add()" style="margin-left: 0px"></el-button>
+      <el-button type="primary" icon="el-icon-circle-plus" @click="add()" style="margin-left: 0px" v-if="authmap.includes('add')"></el-button>
       <el-table
         ref="multipleTable"
         :data="tableData"
@@ -153,9 +156,9 @@
           label="操作"
           width="300">
           <template slot-scope="scope">
-            <el-button type="danger" icon="el-icon-delete" @click="del(scope.row)"></el-button>
-            <el-button type="primary" icon="el-icon-edit" @click="update(scope.row)"></el-button>
-            <el-button type="info" icon="el-icon-s-check" @click="roles(scope.row)"></el-button>
+            <el-button type="danger" icon="el-icon-delete" @click="del(scope.row)" v-if="authmap.includes('del')"></el-button>
+            <el-button type="primary" icon="el-icon-edit" @click="update(scope.row)" v-if="authmap.includes('update')"></el-button>
+            <el-button type="info" icon="el-icon-s-check" @click="roles(scope.row)" v-if="authmap.includes('selRole')"> </el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -170,6 +173,22 @@
         @size-change="changeSize"
         style="margin-left: 600px">
       </el-pagination>
+      </el-tab-pane>
+     <el-tab-pane label="批量添加" name="second">
+
+       <el-upload
+         class="upload-demo"
+         ref="upload"
+         action="http://localhost:10000/api/manger/user/addExcel"
+         :before-upload="beforeUpload"
+         :auto-upload="false">
+         <el-button slot="trigger" size="small" type="primary">选取文件</el-button>
+         <el-button style="margin-left: 10px;" size="small" type="success" @click="submitUpload">上传到服务器</el-button>
+         <div slot="tip" class="el-upload__tip">只能上传jpg/png文件，且不超过500kb</div>
+       </el-upload>
+     </el-tab-pane>
+
+      </el-tabs>
 
     </div>
 </template>
@@ -246,15 +265,42 @@
           dialogFormVisible1:false,
           Roles:[],
           selroleId:"",
-          userId:""
+          userId:"",
+          user:JSON.parse(window.localStorage.getItem("user")),
+          flag1:false,
+          roleLeval:"",
+          userLeval:"",
+          activeName: 'first',
+          authmap:window.localStorage.getItem("authmap")
 
         }
 
       },
       mounted(){
         this.getlist(this.mypage);
+       this.userLeval=this.user.role.leval
+
       },
       methods:{
+        submitUpload() {
+          this.$refs.upload.submit();
+        },
+        //判断上传格式
+        beforeUpload(file) {
+          var testmsg = file.name.substring(file.name.lastIndexOf('.') + 1)
+          const extension = testmsg === 'xls'
+          const extension2 = testmsg === 'xlsx'
+          if(!extension && !extension2) {
+            this.$message({
+              message: '上传文件只能是 xls、xlsx格式!',
+              type: 'warning'
+            });
+          }
+          return extension || extension2
+        },
+        handleClick(tab, event) {
+          console.log(tab, event);
+        },
         getlist(mypage){
           let that = this.$router;
           this.$axios.post(this.domain.serverpath+"user/list",mypage).then((response)=>{
@@ -262,6 +308,12 @@
             this.tableData = response.data.result.list
             this.total = response.data.result.total
 
+
+          }).catch((error)=>{
+            this.$message({
+              message: 'Sorroy! 您无此权限',
+              type: 'error'
+            })
           })
         },
         handleSelectionChange(val) {
@@ -287,6 +339,11 @@
               });
               this.getlist(this.mypage)
             }
+          }).catch((error)=>{
+            this.$message({
+              message: 'Sorroy! 您无此权限',
+              type: 'error'
+            })
           })
         },
         add(){
@@ -323,6 +380,11 @@
                 type: 'error'
               });
             }
+          }).catch((error)=>{
+            this.$message({
+              message: 'Sorroy! 您无此权限',
+              type: 'error'
+            })
           })
 
         },
@@ -338,6 +400,11 @@
               this.dialogFormVisible1=true;
             }
 
+          }).catch((error)=>{
+            this.$message({
+              message: 'Sorroy! 您无此权限',
+              type: 'error'
+            })
           })
         },
         edit(){
@@ -355,6 +422,11 @@
               });
               this.dialogFormVisible1=false
             }
+          }).catch((error)=>{
+            this.$message({
+              message: 'Sorroy! 您无此权限',
+              type: 'error'
+            })
           })
         },
         handleAvatarSuccess(res, file) {
