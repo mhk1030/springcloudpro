@@ -187,13 +187,16 @@
          <div slot="tip" class="el-upload__tip">只能上传jpg/png文件，且不超过500kb</div>
        </el-upload>
      </el-tab-pane>
-
+        <el-tab-pane label="访问量统计" name="third">
+          <div id="main" style="width: 600px;height: 400px;"></div>
+      </el-tab-pane>
       </el-tabs>
 
     </div>
 </template>
 
 <script>
+  import echarts from 'echarts'
     export default {
         name: "userdata",
       data(){
@@ -271,17 +274,63 @@
           roleLeval:"",
           userLeval:"",
           activeName: 'first',
-          authmap:window.localStorage.getItem("authmap")
+          authmap:window.localStorage.getItem("authmap"),
+          charts: '',
+          opinionData: []
 
         }
 
       },
       mounted(){
+        console.log(this.user.keys.reverse())
+        console.log(this.user.values.reverse())
+        this.$nextTick(function() {
+          this.drawLine('main')
+        })
         this.getlist(this.mypage);
        this.userLeval=this.user.role.leval
 
       },
       methods:{
+        drawLine(id) {
+          this.charts = echarts.init(document.getElementById(id))
+          this.charts.setOption({
+            tooltip: {
+              trigger: 'axis'
+            },
+            legend: {
+              data: ['近七日收益']
+            },
+            grid: {
+              left: '3%',
+              right: '4%',
+              bottom: '3%',
+              containLabel: true
+            },
+
+            toolbox: {
+              feature: {
+                saveAsImage: {}
+              }
+            },
+            xAxis: {
+              type: 'category',
+              boundaryGap: false,
+              data: this.user.keys
+
+            },
+            yAxis: {
+              type: 'value'
+            },
+
+            series: [{
+              name: '近七日收益',
+              type: 'line',
+              stack: '总量',
+              data: this.user.values
+            }]
+          })
+        },
         submitUpload() {
           this.$refs.upload.submit();
         },
@@ -472,5 +521,10 @@
     width: 178px;
     height: 178px;
     display: block;
+  }
+  #main {
+    margin: 0;
+    padding: 0;
+    list-style: none;
   }
 </style>

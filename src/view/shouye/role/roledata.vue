@@ -97,7 +97,7 @@
           width="300">
           <template slot-scope="scope">
             <el-button type="danger" icon="el-icon-delete" @click="del(scope.row)" v-if="authmap.includes('roleDel')"></el-button>
-            <el-button type="info" icon="el-icon-s-check" @click="power(scope.row)" v-if="authmap.includes('updateRole')"></el-button>
+            <el-button type="info" icon="el-icon-s-check" @click="power(scope.row)" v-if="authmap.includes('power')"></el-button>
           </template>
         </el-table-column>
       </el-table>
