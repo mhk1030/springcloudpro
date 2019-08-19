@@ -96,8 +96,8 @@
           label="操作"
           width="300">
           <template slot-scope="scope">
-            <el-button type="danger" icon="el-icon-delete" @click="del(scope.row)" v-if="authmap.includes('roleDel')"></el-button>
-            <el-button type="info" icon="el-icon-s-check" @click="power(scope.row)" v-if="authmap.includes('power')"></el-button>
+            <el-button type="danger" icon="el-icon-delete" @click="del(scope.row)" v-if="scope.row.leval >= userLeval && authmap.includes('roleDel')"></el-button>
+            <el-button type="info" icon="el-icon-s-check" @click="power(scope.row)" v-if="scope.row.leval >= userLeval && authmap.includes('power')"></el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -217,6 +217,7 @@
             this.form={id:0}
         },
         del(row){
+          row.menuId=row.menuIds
             this.$axios.post(this.domain.serverpath+"role/roleDel",row).then((response)=>{
               if(response.data.code==200){
                 this.$message({
@@ -233,12 +234,12 @@
                   this.getlist(this.mypage)
                 }
 
-            }).catch((error)=>{
+            })/*.catch((error)=>{
               this.$message({
                 message: 'Sorroy! 您无此权限',
                 type: 'error'
               })
-            })
+            })*/
         },
         power(row){
               this.dialogFormVisible=true;
@@ -273,6 +274,7 @@
               this.form.menuId=menuId
               alert(this.form.menuId)
             }
+            this.form.leval=this.userLeval
             this.$axios.post(url,this.form).then((response)=>{
               if(response.data.code==200) {
                 this.$message({

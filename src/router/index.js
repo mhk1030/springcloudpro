@@ -8,9 +8,11 @@ import system from '../view/shouye/system'
 import roledata from '../view/shouye/role/roledata'
 import userdata from '../view/shouye/user/userdata'
 import menudata from '../view/shouye/menu/menudata'
+import email from '../view/email/email'
 Vue.use(Router)
 
 export default new Router({
+  mode:'history',
   routes: [
     {
       path: '/',
@@ -19,6 +21,11 @@ export default new Router({
       meta:{
         require: false
       }
+    },
+    {
+      path: '/email',
+      name: 'email',
+      component: email,
     },
     {
       path: '/view/shouye/shouye',

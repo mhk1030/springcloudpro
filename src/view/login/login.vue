@@ -58,6 +58,8 @@
                 v-model.number="ruleForm.tel"
                 placeholder="手机号码">
                 <el-button slot="prepend" icon="el-icon-phone-outline"></el-button>
+                <el-button slot="append" @click="getAuthCode" v-show="sendAuthCode" >获取验证码</el-button>
+                <el-button slot="append" v-show="!sendAuthCode">{{auth_time}}秒</el-button>
               </el-input>
 
             </el-form-item>
@@ -65,8 +67,6 @@
               <el-input type="text" v-model.number="verification1" placeholder="输入验证码">
                 <el-button slot="prepend" icon="el-icon-s-order"></el-button>
               </el-input>
-              <el-button type="success"  @click="getAuthCode" v-show="sendAuthCode" >获取验证码</el-button>
-              <el-button type="success"   v-show="!sendAuthCode">{{auth_time}}秒</el-button>
             </el-form-item>
 
 
@@ -90,8 +90,8 @@
                 <el-button slot="prepend" icon="el-icon-s-custom"></el-button>
               </el-input>
             </el-form-item>
-            <el-form-item prop="el-icon-message" >
-              <el-input v-model="email.email" placeholder="请输入邮箱">
+            <el-form-item prop="email" >
+              <el-input v-model="email.emails" placeholder="请输入邮箱">
                 <el-button slot="prepend" icon="el-icon-message"></el-button>
               </el-input>
             </el-form-item>
@@ -167,6 +167,39 @@
       }
     },
     methods:{
+      findEmail(){
+        if(this.email.username==""||this.email.username==null){
+          this.$notify.info({
+            title: '提示',
+            message: '请填写用户名'
+          });
+          return;
+        }
+        if(this.email.emails==""||this.email.emails==null){
+          this.$notify.info({
+            title: '提示',
+            message: '请填写验证邮箱'
+          });
+          return;
+        }
+        this.$axios.post(this.domain.ssoserverpath+"checkEmail",this.email).then((response)=>{
+
+
+          if(response.data.code==200){
+            this.$message({
+              message: response.data.success,
+              type: 'success'
+            });
+          }
+          if(response.data.code==500){
+            this.$message({
+              message: response.data.error,
+              type: 'error'
+            });
+          }
+        })
+
+      },
       selPass(){
         this.activeName="third"
       },
@@ -202,8 +235,8 @@
 
             if(response.data.code==200){
               //存储token到vuex中，
-              this.$store.state.token=response.data.token
-              this.$store.state.userInfo=response.data.result
+             // this.$store.state.token=response.data.token
+              //this.$store.state.userInfo=response.data.result
               if(this.checked){
                 setCookie("jian","zhi",7)
               }
@@ -247,7 +280,7 @@
               });
             }
 
-          }).catch((error)=>{
+          })/*.catch((error)=>{
             //关闭加载窗
             this.$data.percent=100;
             //隐藏进度条
@@ -258,7 +291,7 @@
               title: '错误',
               message: '出错了~_~，请联系管理员！'
             });
-          })
+          })*/
 
 
       },
@@ -278,6 +311,7 @@
       }
 
         this.$axios.post(this.domain.ssoserverpath+"getcode",phoneMap).then((response)=> {
+          alert(this.auth_time)
             if(response.data.code==200){
               this.$message({
                 message: response.data.success,
@@ -289,10 +323,12 @@
               var auth_timetimer = setInterval(()=>{
                 this.auth_time--;
                 if(this.auth_time<=0){
+
                   this.sendAuthCode = true;
                   clearInterval(auth_timetimer);
                 }
               }, 1000);
+
             }
             if(response.data.code==500){
               this.$message({

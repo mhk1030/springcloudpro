@@ -60,7 +60,7 @@
       </el-dialog>
 
       <el-tabs v-model="activeName" @tab-click="handleClick">
-      <el-tab-pane label="角色信息" name="first">
+      <el-tab-pane label="用户信息" name="first">
       <!--以下为条件查询，以上为弹出框-->
       <el-form :inline="true" :model="mypage" class="demo-form-inline" style="margin-left: 100px;margin-right: 150px">
         <el-form-item label="用户名">
@@ -156,9 +156,9 @@
           label="操作"
           width="300">
           <template slot-scope="scope">
-            <el-button type="danger" icon="el-icon-delete" @click="del(scope.row)" v-if="authmap.includes('del')"></el-button>
-            <el-button type="primary" icon="el-icon-edit" @click="update(scope.row)" v-if="authmap.includes('update')"></el-button>
-            <el-button type="info" icon="el-icon-s-check" @click="roles(scope.row)" v-if="authmap.includes('selRole')"> </el-button>
+            <el-button type="danger" icon="el-icon-delete" @click="del(scope.row)" v-if="scope.row.role.leval >= userLeval && authmap.includes('del')"></el-button>
+            <el-button type="primary" icon="el-icon-edit" @click="update(scope.row)" v-if="scope.row.role.leval >= userLeval && authmap.includes('update')"></el-button>
+            <el-button type="info" icon="el-icon-s-check" @click="roles(scope.row)" v-if="scope.row.role.leval >= userLeval && authmap.includes('selRole')"> </el-button>
           </template>
         </el-table-column>
       </el-table>
