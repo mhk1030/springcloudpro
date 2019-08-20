@@ -217,8 +217,8 @@
             this.form={id:0}
         },
         del(row){
-          row.menuId=row.menuIds
-            this.$axios.post(this.domain.serverpath+"role/roleDel",row).then((response)=>{
+          row.menuId=row.menuAll;
+         this.$axios.post(this.domain.serverpath+"role/roleDel",row).then((response)=>{
               if(response.data.code==200){
                 this.$message({
                   message: 'ok!'+response.data.success,
@@ -234,12 +234,12 @@
                   this.getlist(this.mypage)
                 }
 
-            })/*.catch((error)=>{
+            }).catch((error)=>{
               this.$message({
                 message: 'Sorroy! 您无此权限',
                 type: 'error'
               })
-            })*/
+            })
         },
         power(row){
               this.dialogFormVisible=true;

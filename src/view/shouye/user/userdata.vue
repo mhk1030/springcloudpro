@@ -39,6 +39,16 @@
           <el-form-item label="确认密码" :label-width="formLabelWidth" prop="checkPass">
             <el-input type="password" v-model="form.checkPass" autocomplete="off"></el-input>
           </el-form-item>
+            <el-form-item
+              prop="email"
+              label="邮箱"
+              :rules="[
+              { required: true, message: '请输入邮箱地址', trigger: 'blur' },
+              { type: 'email', message: '请输入正确的邮箱地址', trigger: ['blur', 'change'] }
+                   ]"
+                >
+              <el-input v-model="form.email"></el-input>
+            </el-form-item>
 
           <el-form-item label="图片" :label-width="formLabelWidth">
             <el-upload
@@ -197,8 +207,10 @@
 
 <script>
   import echarts from 'echarts'
+  import Email from "../../email/email";
     export default {
         name: "userdata",
+      components: {Email},
       data(){
 
         var checkPhone = (rule, value, callback) => {
